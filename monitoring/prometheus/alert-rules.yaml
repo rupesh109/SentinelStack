@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  namespace: monitoring
+data:
+  alerts.yml: |
+    groups:
+      - name: sentinelstack_alerts
+        interval: 30s
+        rules:
+          # High error rate
+          - alert: HighErrorRate
+            expr: |
+              sum(rate(http_requests_total{status=~"5.."}[5m])) by (job)
+              /
+              sum(rate(http_requests_total[5m])) by (job)
+              > 0.05
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "High error rate detected"
+              description: "{{ $labels.job }} has error rate of {{ $value | humanizePercentage }}"
+
+          # High latency
+          - alert: HighLatency
+            expr: |
+              histogram_quantile(0.95,
+                sum(rate(http_request_duration_seconds_bucket[5m])) by (le, job)
+              ) > 2
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High latency detected"
+              description: "{{ $labels.job }} p95 latency is {{ $value }}s"
+
+          # Pod crash looping
+          - alert: PodCrashLooping
+            expr: |
+              rate(kube_pod_container_status_restarts_total[15m]) > 0
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Pod is crash looping"
+              description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is restarting frequently"
+
+          # High memory usage
+          - alert: HighMemoryUsage
+            expr: |
+              container_memory_usage_bytes / container_spec_memory_limit_bytes > 0.9
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High memory usage"
+              description: "Container {{ $labels.container }} memory usage is {{ $value | humanizePercentage }}"
+
+          # Pod not ready
+          - alert: PodNotReady
+            expr: |
+              kube_pod_status_ready{condition="false"} == 1
+            for: 10m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Pod not ready"
+              description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is not ready"

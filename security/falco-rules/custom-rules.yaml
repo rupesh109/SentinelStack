@@ -1,0 +1,49 @@
+# Custom Falco rules for SentinelStack
+- rule: Unauthorized Process in Container
+  desc: Detect unauthorized process execution in containers
+  condition: >
+    spawned_process and container and
+    not proc.name in (python, uvicorn, node, nginx, sh, bash)
+  output: >
+    Unauthorized process started in container
+    (user=%user.name command=%proc.cmdline container_id=%container.id
+    container_name=%container.name image=%container.image.repository)
+  priority: WARNING
+  tags: [container, process]
+
+- rule: Write to Sensitive Directory
+  desc: Detect writes to sensitive directories
+  condition: >
+    open_write and container and
+    (fd.name startswith /etc or
+     fd.name startswith /root or
+     fd.name startswith /usr/bin)
+  output: >
+    Write to sensitive directory
+    (user=%user.name command=%proc.cmdline file=%fd.name
+    container_id=%container.id container_name=%container.name)
+  priority: ERROR
+  tags: [filesystem, container]
+
+- rule: Privilege Escalation Attempt
+  desc: Detect privilege escalation attempts
+  condition: >
+    spawned_process and container and
+    proc.name in (sudo, su, setuid) and
+    not user.name = root
+  output: >
+    Privilege escalation attempt detected
+    (user=%user.name command=%proc.cmdline container_id=%container.id)
+  priority: CRITICAL
+  tags: [security, privilege_escalation]
+
+- rule: Suspicious Network Activity
+  desc: Detect suspicious outbound connections
+  condition: >
+    outbound and container and
+    not fd.sip in (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)
+  output: >
+    Suspicious outbound connection
+    (user=%user.name connection=%fd.name container_id=%container.id)
+  priority: WARNING
+  tags: [network, container]

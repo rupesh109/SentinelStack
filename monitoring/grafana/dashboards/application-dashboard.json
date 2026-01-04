@@ -1,0 +1,53 @@
+{
+  "dashboard": {
+    "title": "SentinelStack Application Metrics",
+    "tags": ["sentinelstack", "production"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Request Rate",
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total[5m])) by (job)",
+            "legendFormat": "{{ job }}"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "id": 2,
+        "title": "Error Rate",
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) by (job) / sum(rate(http_requests_total[5m])) by (job)",
+            "legendFormat": "{{ job }}"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "id": 3,
+        "title": "P95 Latency",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, job))",
+            "legendFormat": "{{ job }}"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "id": 4,
+        "title": "Pod Restarts",
+        "targets": [
+          {
+            "expr": "sum(kube_pod_container_status_restarts_total) by (namespace, pod)",
+            "legendFormat": "{{ namespace }}/{{ pod }}"
+          }
+        ],
+        "type": "graph"
+      }
+    ]
+  }
+}
