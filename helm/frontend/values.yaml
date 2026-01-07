@@ -1,72 +1,28 @@
-replicaCount: 3
-
-image:
-  repository: sentinelstackacr.azurecr.io/frontend
-  pullPolicy: IfNotPresent
-  tag: "latest"
-
-service:
-  type: ClusterIP
-  port: 80
-  targetPort: 80
-
-ingress:
-  enabled: true
-  className: nginx
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-  hosts:
-    - host: sentinelstack.example.com
-      paths:
-        - path: /
-          pathType: Prefix
-  tls:
-    - secretName: sentinelstack-tls
-      hosts:
-        - sentinelstack.example.com
-
-resources:
-  limits:
-    cpu: 500m
-    memory: 512Mi
-  requests:
-    cpu: 250m
-    memory: 256Mi
+replicaCount: 2
 
 autoscaling:
-  enabled: true
-  minReplicas: 2
-  maxReplicas: 10
-  targetCPUUtilizationPercentage: 70
-  targetMemoryUtilizationPercentage: 80
+  enabled: false
 
-livenessProbe:
-  httpGet:
-    path: /health
-    port: 80
-  initialDelaySeconds: 30
-  periodSeconds: 10
-  timeoutSeconds: 5
-  failureThreshold: 3
+image:
+  repository: sentinelstackaksacr.azurecr.io/frontend
+  tag: final
+  pullPolicy: Always
 
-readinessProbe:
-  httpGet:
-    path: /health
-    port: 80
-  initialDelaySeconds: 10
-  periodSeconds: 5
-  timeoutSeconds: 3
-  failureThreshold: 3
+service:
+  type: LoadBalancer
+  port: 80
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "200m"
 
 securityContext:
   runAsNonRoot: true
   runAsUser: 101
-  fsGroup: 101
   capabilities:
     drop:
       - ALL
-
-podSecurityContext:
-  seccompProfile:
-    type: RuntimeDefault

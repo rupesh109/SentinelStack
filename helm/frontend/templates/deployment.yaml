@@ -6,9 +6,7 @@ metadata:
   labels:
     {{- include "sentinelstack-frontend.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       app: frontend
@@ -31,7 +29,7 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - name: http
-          containerPort: 80
+          containerPort: 8080
           protocol: TCP
         livenessProbe:
           {{- toYaml .Values.livenessProbe | nindent 10 }}

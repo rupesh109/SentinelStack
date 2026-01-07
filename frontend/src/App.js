@@ -9,7 +9,7 @@ import './App.css';
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [user, setUser] = useState(null);
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+  const API_BASE_URL =  '/api';
 
   // Axios instance with token
   const api = axios.create({
