@@ -31,6 +31,7 @@ fake_users_db = {
     }
 }
 
+
 def authenticate_user(username: str, password: str):
     user = fake_users_db.get(username)
     if not user:
@@ -42,6 +43,7 @@ def authenticate_user(username: str, password: str):
         pass
     return None
 
+
 def create_access_token(sub: str):
     payload = {
         "sub": sub,
@@ -49,43 +51,49 @@ def create_access_token(sub: str):
     }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
+
 @app.get("/")
 def root():
     print("Root endpoint called")
     return {"message": "SentinelStack Backend", "status": "running"}
+
 
 @app.get("/health")
 def health():
     print("Health endpoint called")
     return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
 
+
 @app.get("/ready")
 def ready():
     print("Ready endpoint called")
     return {"status": "ready", "timestamp": datetime.utcnow().isoformat()}
 
+
 @app.post("/api/auth/login")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     print(f"Login endpoint called - username: {form_data.username}")
-    
+
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
         print(f"Authentication failed for: {form_data.username}")
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    
+
     token = create_access_token(user["username"])
     print(f"Login successful for: {form_data.username}")
-    
+
     return {"access_token": token, "token_type": "bearer"}
+
 
 @app.get("/api/test")
 def test():
     print("Test endpoint called")
     return {"message": "API test successful"}
 
+
 print("\nRegistered routes:")
 for route in app.routes:
-    if hasattr(route, 'path'):
-        methods = getattr(route, 'methods', set())
+    if hasattr(route, "path"):
+        methods = getattr(route, "methods", set())
         print(f"  {route.path} - {methods}")
 print("=" * 50)

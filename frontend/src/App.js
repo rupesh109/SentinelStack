@@ -2,26 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import LandingPage from './components/LandingPage';
-import Dashboard from './components/Dashboard';
 import Login from './components/Login';
+import Dashboard from './components/Dashboard';
 import './App.css';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [user, setUser] = useState(null);
-  const API_BASE_URL =  '/api';
 
-  // Axios instance with token
+  const API_BASE_URL = '/api';
+  
   const api = axios.create({
     baseURL: API_BASE_URL,
     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
 
-  // Load user on mount if token exists
   useEffect(() => {
     if (token) {
-      api.get('/api/users/me')
-        .then(res => setUser(res.data))
+      api.get('/users/me')
+        .then(response => setUser(response.data))
         .catch(() => {
           localStorage.removeItem('token');
           setToken(null);
@@ -43,10 +42,7 @@ function App() {
       
       return { success: true };
     } catch (error) {
-      return { 
-        success: false, 
-        error: error.response?.data?.detail || 'Login failed' 
-      };
+      return { success: false, error: error.response?.data?.detail || 'Login failed' };
     }
   };
 
@@ -60,26 +56,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route 
-          path="/login" 
-          element={
-            token ? <Navigate to="/dashboard" /> : <Login onLogin={handleLogin} />
-          } 
-        />
-        <Route 
-          path="/dashboard" 
-          element={
-            token ? (
-              <Dashboard 
-                api={api} 
-                user={user} 
-                onLogout={handleLogout} 
-              />
-            ) : (
-              <Navigate to="/login" />
-            )
-          } 
-        />
+        <Route path="/login" element={token ? <Navigate to="/dashboard" /> : <Login onLogin={handleLogin} />} />
+        <Route path="/dashboard" element={token ? <Dashboard api={api} user={user} onLogout={handleLogout} /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );
