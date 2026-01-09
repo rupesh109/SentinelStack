@@ -138,6 +138,7 @@ jobs:
           exit-code: '0'
         continue-on-error: true
         continue-on-error: true
+        continue-on-error: true
 
       - name: Upload Trivy results
         uses: github/codeql-action/upload-sarif@v2
