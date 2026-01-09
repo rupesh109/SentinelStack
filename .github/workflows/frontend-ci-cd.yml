@@ -12,7 +12,7 @@ on:
       - 'frontend/**'
 
 env:
-  AZURE_CONTAINER_REGISTRY: sentinelstackacr
+  AZURE_CONTAINER_REGISTRY: sentinelstackaksacr
   IMAGE_NAME: frontend
   CLUSTER_NAME: sentinelstack-aks
   RESOURCE_GROUP: sentinelstack-rg

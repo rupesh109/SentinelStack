@@ -12,7 +12,7 @@ on:
       - 'backend/**'
 
 env:
-  AZURE_CONTAINER_REGISTRY: sentinelstackacr
+  AZURE_CONTAINER_REGISTRY: sentinelstackaksacr
   IMAGE_NAME: backend
   CLUSTER_NAME: sentinelstack-aks
   RESOURCE_GROUP: sentinelstack-rg
