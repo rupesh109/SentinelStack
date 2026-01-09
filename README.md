@@ -334,5 +334,3 @@ Project Link: [https://github.com/rupesh109/SentinelStack](https://github.com/ru
 - [GitOps with Helm](https://helm.sh/docs/)
 ```
 
----
-
