@@ -8,7 +8,6 @@
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue)](https://www.linkedin.com/in/rupesh-kumar-jha-b04b2119b/)
 > Production-grade microservices platform demonstrating enterprise DevSecOps practices with Zero Trust architecture, automated security scanning, and comprehensive observability on Azure Kubernetes Service.
 
-Deployed Application Link: http://51.8.34.154/
 
 ## 🎯 Project Overview
 
